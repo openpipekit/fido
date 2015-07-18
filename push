@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+var log = console.log
+
+var fs = require('fs')
+var program = require('commander')
+var exec = require('child_process').exec;
+var email = require('./email.js')
+
+program
+  .version('0.0.0')
+  .option('--name <name>', 'A unique name for this Fido')
+  .option('--minimum <repository>')
+  .option('--maximum <destination>')
+  .option('--email <address>', 'A JSON object to feed into the templates. You must provide all variables.')
+  .parse(process.argv);
+
+var receivedValue = ''
+
+process.stdin.on('error', function(e) {
+  console.log("error: "+e)
+})
+
+process.stdin.on('data', function(chunk) {
+  if (chunk)
+    receivedValue += chunk
+})
+process.stdin.on('end', function() {
+  go()
+})
+
+function go() {
+  fs.readFile(__dirname + '/.fido-' + program.name, {encoding: 'utf8'}, function(err, value) {
+    if (value == '' || err) { 
+      if (receivedValue > program.maximum) {
+        trigger(program.name + ' has detected a value of ' + receivedValue + ' which is more than your maximum of ' + program.maximum)
+      }
+      else if (receivedValue < program.minimum) {
+        trigger(program.name + ' has detected a value of ' + receivedValue + ' which is less than your minimum of ' + program.minimum)
+      }
+    }
+    else {
+      if (receivedValue < program.maximum && receivedValue > program.minimum) {
+        fs.writeFile(__dirname + '/.fido-' + program.name, '')
+      }
+    }
+  })
+}
+
+function trigger(message) {
+  fs.writeFile(__dirname + '/.fido-' + program.name, receivedValue, function(err) {
+    if (err) {
+      log(err)
+      //fs.createFile(__dirname + '/.fido-' + program.name, receivedValue, function(err) {
+        email(message, email)
+      //})
+    }
+    else {
+      email(message, email)
+    }
+  })
+}

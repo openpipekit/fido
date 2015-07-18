@@ -1,0 +1,17 @@
+{
+  "name": "fido",
+  "version": "0.0.0",
+  "description": "",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "fido": "push"
+  },
+  "author": "R.J. Steinert",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.8.1",
+  }
+}
