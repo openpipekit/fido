@@ -5,15 +5,28 @@ var log = console.log
 var fs = require('fs')
 var program = require('commander')
 var exec = require('child_process').exec;
-var email = require('./email.js')
+var sendEmail = require('./lib/SendEmail.js')
+var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
 
 program
   .version('0.0.0')
   .option('--name <name>', 'A unique name for this Fido')
   .option('--minimum <repository>')
   .option('--maximum <destination>')
-  .option('--email <address>', 'A JSON object to feed into the templates. You must provide all variables.')
+  .option('--emailTo <address>', 'A JSON object to feed into the templates. You must provide all variables.')
+  .option('--emailUserName <user name>')
+  .option('--emailPassword <password>')
+  .option('--emailSubject <subject>')
+  .option('--verbose')
   .parse(process.argv);
+
+var sendEmailOptions = {
+  userName: program.emailUserName,
+  password: program.emailPassword,
+  to: program.emailTo,
+  subject: program.emailSubject,
+  message: ''
+}
 
 var receivedValue = ''
 
@@ -30,7 +43,7 @@ process.stdin.on('end', function() {
 })
 
 function go() {
-  fs.readFile(__dirname + '/.fido-' + program.name, {encoding: 'utf8'}, function(err, value) {
+  fs.readFile(home + '/.fido-' + program.name, {encoding: 'utf8'}, function(err, value) {
     if (value == '' || err) { 
       if (receivedValue > program.maximum) {
         trigger(program.name + ' has detected a value of ' + receivedValue + ' which is more than your maximum of ' + program.maximum)
@@ -41,22 +54,23 @@ function go() {
     }
     else {
       if (receivedValue < program.maximum && receivedValue > program.minimum) {
-        fs.writeFile(__dirname + '/.fido-' + program.name, '')
+        fs.writeFile(home + '/.fido-' + program.name, '')
       }
     }
   })
 }
 
 function trigger(message) {
-  fs.writeFile(__dirname + '/.fido-' + program.name, receivedValue, function(err) {
-    if (err) {
-      log(err)
-      //fs.createFile(__dirname + '/.fido-' + program.name, receivedValue, function(err) {
-        email(message, email)
-      //})
-    }
-    else {
-      email(message, email)
-    }
+  if (program.verbose)  log('Triggered...')
+
+  sendEmailOptions.message = message
+  fs.open(home + '/.fido-' + program.name, 'w', function(err, fd) {
+    var buffer = new Buffer(receivedValue)
+    fs.write(fd, buffer, 0, buffer.length, null, function(err) {
+      sendEmail(sendEmailOptions, function(err) {
+        if (err) log(err)
+      })
+    })
+
   })
 }

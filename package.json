@@ -1,5 +1,5 @@
 {
-  "name": "fido",
+  "name": "opk-cli--fido",
   "version": "0.0.0",
   "description": "",
   "main": "cli.js",
@@ -12,6 +12,6 @@
   "author": "R.J. Steinert",
   "license": "ISC",
   "dependencies": {
-    "commander": "^2.8.1",
+    "commander": "^2.8.1"
   }
 }
