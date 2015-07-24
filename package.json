@@ -12,6 +12,7 @@
   "author": "R.J. Steinert",
   "license": "ISC",
   "dependencies": {
-    "commander": "^2.8.1"
+    "commander": "^2.8.1",
+    "nodemailer": "^1.4.0"
   }
 }
