@@ -10,14 +10,25 @@ child.stderr.on('data', function(data) {
   console.log(data)
 })
 child.on('close', function(code) {
-  var child2 = exec('sudo apt-get install mailutils -y')
+  var child2 = exec('sudo apt-get update')
   child.stdout.on('data', function(data) {
     console.log(data)
   })
-  child.stderr.on('data', function(data) {
+  child2.stderr.on('data', function(data) {
     console.log(data)
   })
-  child.on('close', function(code) {
-    console.log('Installing mailutils finished with code ' + code)
+  child2.on('close', function(code) {
+    console.log('Updated apt-get with code ' + code)
+    var child3 = exec('sudo apt-get install mailutils -y')
+    child.stdout.on('data', function(data) {
+      console.log(data)
+    })
+    child3.stderr.on('data', function(data) {
+      console.log(data)
+    })
+    child3.on('close', function(code) {
+      console.log('Installing mailutils finished with code ' + code)
+    })
+
   })
 })
