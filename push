@@ -18,7 +18,7 @@ var push = require('./lib/SendEmail.js')
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
 
 program
-  .version('0.0.0')
+  .version('0.0.1')
   .option('--name <name>', 'A unique name for this Fido')
   .option('--minimum <repository>')
   .option('--maximum <destination>')
@@ -38,11 +38,13 @@ var pushOptions = {
 
 // convert string to int
 
-program.minimum = parseInt(program.minimum)
-program.maximum = parseInt(program.maximum)
+program.minimum = parseFloat(program.minimum)
+program.maximum = parseFloat(program.maximum)
+
+if(program.verbose) log('minimum: ' + program.minimum)
+if(program.verbose) log('maximum: ' + program.maximum)
 
 var receivedValue = ''
-
 process.stdin.on('error', function(e) {
   console.log("error: "+e)
 })
@@ -52,7 +54,8 @@ process.stdin.on('data', function(chunk) {
     receivedValue += chunk
 })
 process.stdin.on('end', function() {
-  receivedValue = parseInt(receivedValue)
+  receivedValue = parseFloat(receivedValue)
+  if(program.verbose) log('receivedValue: ' + receivedValue)
   sniff()
 })
 
