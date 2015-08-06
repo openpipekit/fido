@@ -2,7 +2,6 @@
 
 var exec = require('child_process').exec;
 console.log('Installing...')
-
 var child = exec('cd ' + __dirname + '; sudo npm install;')
 child.stdout.on('data', function(data) {
   console.log(data)
@@ -11,7 +10,6 @@ child.stderr.on('data', function(data) {
   console.log(data)
 })
 child.on('close', function(code) {
-
   var child2 = exec('sudo apt-get update')
   child2.stdout.on('data', function(data) {
     console.log(data)
@@ -21,8 +19,6 @@ child.on('close', function(code) {
   })
   child2.on('close', function(code) {
     console.log('Updated apt-get with code ' + code)
-
-    console.log('sudo apt-get install mailutils -y')
     var child3 = exec('sudo apt-get install mailutils -y')
     child3.stdout.on('data', function(data) {
       console.log(data)
@@ -31,36 +27,18 @@ child.on('close', function(code) {
       console.log(data)
     })
     child3.on('close', function(code) {
-      console.log('Installing mailutils finished with code ' + code)
-
-      console.log('export DEBIAN_FRONTEND=noninteractive')
-      var child4 = exec('export DEBIAN_FRONTEND=noninteractive')
+      console.log('Installing postfix finished with code ' + code)
+      var child4 = exec('sudo DEBIAN_FRONTEND=noninteractive apt-get install postfix -y')
       child4.stdout.on('data', function(data) {
         console.log(data)
       })
       child4.stderr.on('data', function(data) {
         console.log(data)
       })
-
       child4.on('close', function(code) {
-        console.log('export finished with code ' + code)
-
-        console.log('sudo apt-get install postfix -y')
-        var child5 = exec('sudo apt-get install postfix -y')
-        child5.stdout.on('data', function(data) {
-          console.log(data)
-        })
-        child5.stderr.on('data', function(data) {
-          console.log(data)
-        })
-        child5.on('close', function(code) {
-          console.log('Installing postfix finished with code ' + code)
-        })
-
+        console.log('Installing postfix finished with code ' + code)
       })
-
     })
 
   })
-
 })
