@@ -16,6 +16,7 @@ var program = require('commander')
 var exec = require('child_process').exec;
 var push = require('./lib/SendEmail.js')
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+var isJson = require('is-json')
 
 program
   .version('0.0.1')
@@ -25,6 +26,7 @@ program
   .option('--emailTo <address>', 'A JSON object to feed into the templates. You must provide all variables.')
   .option('--emailUserName <user name>')
   .option('--emailPassword <password>')
+  .option('--sensorId <sensor id>')
   .option('--verbose')
   .parse(process.argv);
 
@@ -54,7 +56,6 @@ process.stdin.on('data', function(chunk) {
     receivedValue += chunk
 })
 process.stdin.on('end', function() {
-  receivedValue = parseFloat(receivedValue)
   if(program.verbose) log('receivedValue: ' + receivedValue)
   sniff()
 })
@@ -63,6 +64,23 @@ process.stdin.on('end', function() {
  * Sniff STDIN to see if it is in or out of bounds, then check the process file to see what to do.
  */
 function sniff() {
+
+  // If our receivedValue is JSON, get our actual sensor value and assign it to recievedValue.
+  if (isJson(receivedValue) === true) {
+    var packet = JSON.parse(receivedValue)
+    if (program.hasOwnProperty('sensorId')) {
+      receivedValue = packet[program.sensorId] 
+    }
+    else {
+      // If we haven't been told a sensor_id, then use the first value in the array.
+      receivedValue = packet[(_.keys(packet))[0]]
+    }
+  }
+
+  // Make sure recievedValue is a float
+  receivedValue = parseFloat(receivedValue)
+  if (receivedValue === NaN) console.error('Error: Received value is not a number')
+
   fs.readFile(home + '/.fido-' + program.name, {encoding: 'utf8'}, function(err, value) {
     // No file means the program has not yet started.
     if (err) {

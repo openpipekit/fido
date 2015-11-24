@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.8.1",
+    "is-json": "^1.2.5",
     "nodemailer": "^1.4.0"
   }
 }
