@@ -27,17 +27,13 @@ program
   .option('--emailTo <address>', 'A JSON object to feed into the templates. You must provide all variables.')
   .option('--emailUserName <user name>')
   .option('--emailPassword <password>')
+  .option('--emailServer <smtp server address>', 'For example, Gmail is smpt.gmail.com:587')
+  .option('--emailFrom <an email from address>')
   .option('--sensorId <sensor id>')
   .option('--verbose')
   .parse(process.argv);
 
-var pushOptions = {
-  userName: program.emailUserName,
-  password: program.emailPassword,
-  to: program.emailTo,
-  subject: '',
-  message: ''
-}
+pushOptions = program
 
 // convert string to int
 
@@ -113,6 +109,7 @@ function sniff() {
 function bark(message) {
   if (program.verbose)  log('Triggered...')
   pushOptions.message = message
+  pushOptions.subject = 'Fido Alert for ' + program.name
   fs.open(home + '/.fido-' + program.name, 'w', function(err, fd) {
     var buffer = new Buffer(receivedValue.toString())
     fs.write(fd, buffer, 0, buffer.length, null, function(err) {

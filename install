@@ -19,7 +19,7 @@ child.on('close', function(code) {
   })
   child2.on('close', function(code) {
     console.log('Updated apt-get with code ' + code)
-    var child3 = exec('sudo apt-get install mailutils -y')
+    var child3 = exec('sudo apt-get install heirloom-mailx -y')
     child3.stdout.on('data', function(data) {
       console.log(data)
     })
@@ -27,18 +27,7 @@ child.on('close', function(code) {
       console.log(data)
     })
     child3.on('close', function(code) {
-      console.log('Installing postfix finished with code ' + code)
-      var child4 = exec('sudo DEBIAN_FRONTEND=noninteractive apt-get install postfix -y')
-      child4.stdout.on('data', function(data) {
-        console.log(data)
-      })
-      child4.stderr.on('data', function(data) {
-        console.log(data)
-      })
-      child4.on('close', function(code) {
-        console.log('Installing postfix finished with code ' + code)
-      })
+      console.log('Installing heirloom-mailx finished with code ' + code)
     })
-
   })
 })
