@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+
+HOME=process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+NAME=$0
+MINIMUM=$2
+MAXIMUM=$3
+PROCESS_FILE=$HOME/.fido-$NAME
+
+while IFS= read -r VALUE; do
+  printf '%s\n' "$VALUE" # Or: env POSIXLY_CORRECT=1 echo "$VALUE"
+
+  if [ -f $PROCESS_FILE ]; then
+
+    echo $VALUE > $PROCESS_FILE 
+  
+    if [ $VALUE > $MAXIMUM ]; then 
+      echo "$NAME has detected a value of $VALUE which is more than your maximum of $MAXIMUM"
+      rm $PROCESS_FILE
+    fi
+
+    if [ $VALUE < $MINIMUM ]; then
+      echo "$NAME has detected a value of $VALUE which is less your maximum of $MINIMUM"
+      rm $PROCESS_FILE
+    fi
+
+  else 
+    # Do nothing unless the receivedValue is back in bounds, in which case blank the file
+    if [ $VALUE < $MAXIMUM && $VALUE > $MINIMUM ]; then 
+      echo $VALUE > $PROCESS_FILE 
+    fi
+  fi
+done < <(cat -- "$file")
+
