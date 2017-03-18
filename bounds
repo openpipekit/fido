@@ -1,0 +1,84 @@
+#!/usr/bin/env bash 
+
+# Usage output.
+function usage()
+{
+    echo "Bounds."
+    echo ""
+    echo "bounds"
+    echo "\t-h --help"
+    echo "\t--minimum=$MINIMUM"
+    echo "\t--maximum=$MAXIMUM"
+    echo "\t--process-name=$PROCESS_NAME"
+    echo ""
+}
+
+# Parse options.
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+        -h | --help)
+            usage
+            exit
+            ;;
+        --process-name)
+            PROCESS_NAME=$VALUE
+            ;;
+        --minimum)
+            MINIMUM=$VALUE
+            ;;
+        --maximum)
+            MAXIMUM=$VALUE
+            ;;
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# @TODO Check for min and max.
+
+# States.
+LAST_VALUE_WAS_IN_BOUNDS="true"
+CURRENT_VALUE_IS_IN_BOUNDS="false"
+
+# If we have a process name, set up a state store on the file system.
+if [ $PROCESS_NAME ]; then
+  STATE_STORE="/tmp/.bounds-process-$PROCESS_NAME"
+  if [-f $STATE_STORE ]; then 
+    $LAST_VALUE_WAS_IN_BOUNDS=$(cat $STATE_STORE)  
+  else
+    touch $STATE_STORE
+    echo "$CURRENT_VALUE_IS_IN_BOUNDS" > $STATE_STORE
+  fi
+fi 
+
+# Read from pipe's stdin and echo if boundaries are crossed.
+while read VALUE 
+do
+  if (( $VALUE < $MAXIMUM )) && (( $VALUE > $MINUMUM )); then 
+    $CURRENT_VALUE_IS_IN_BOUNDS="true"
+  else
+    $CURRENT_VALUE_IS_IN_BOUNDS="false"
+  fi
+  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "true" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "" ] ; then
+    echo "in bounds" 
+  fi
+  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "false" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "" ] ; then
+    echo "out of bounds"
+  fi
+  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "true" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "false" ] ; then
+    echo "now in bounds"
+  fi
+  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "false" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "true" ] ; then
+    echo "now out of bounds"
+  fi
+  # Save state.
+  if [ $PROCESS_NAME ]; then
+    echo "$CURRENT_VALUE_IS_IN_BOUNDS" > $STATE_STORE
+  fi
+done < /dev/stdin
