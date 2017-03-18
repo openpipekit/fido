@@ -25,6 +25,7 @@ do
   else 
     # Do nothing unless the VALUE is back in bounds, in which case blank the file
     if (( $VALUE < $MAXIMUM )) && (( $VALUE > $MINIMUM )); then 
+      echo "$NAME is now in bounds with a value of $VALUE"
       touch $PROCESS_FILE
       echo $VALUE > $PROCESS_FILE 
     fi
