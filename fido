@@ -1,27 +1,61 @@
 #!/usr/bin/env bash 
 
-NAME=$1
-MINIMUM=$2
-MAXIMUM=$3
-PROCESS_FILE="/tmp/.fido-$NAME"
+# Usage output.
+function usage()
+{
+    echo "Fido."
+    echo ""
+    echo "fido"
+    echo "\t-h --help"
+    echo "\t--process-name=$PROCESS_NAME"
+    echo "\t--minimum=$MINIMUM"
+    echo "\t--maximum=$MAXIMUM"
+    echo ""
+}
 
+# Parse options.
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+        -h | --help)
+            usage
+            exit
+            ;;
+        --process-name)
+            PROCESS_NAME=$VALUE
+            ;;
+        --minimum)
+            MINIMUM=$VALUE
+            ;;
+        --maximum)
+            MAXIMUM=$VALUE
+            ;;
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# Set PROCESS_FILE path.
+PROCESS_FILE="/tmp/.fido-$PROCESS_NAME"
+
+# Read from pipe's stdin and echo if boundaries are crossed.
 while read VALUE 
 do
-
   if [ -f $PROCESS_FILE ]; then
-
     echo $VALUE > $PROCESS_FILE 
-  
     if (( $VALUE > $MAXIMUM )); then 
       echo "$NAME has detected a value of $VALUE which is more than your maximum of $MAXIMUM"
       rm $PROCESS_FILE
     fi
-
     if (( $VALUE < $MINIMUM )); then
       echo "$NAME has detected a value of $VALUE which is less your maximum of $MINIMUM"
       rm $PROCESS_FILE
     fi
-
   else 
     # Do nothing unless the VALUE is back in bounds, in which case blank the file
     if (( $VALUE < $MAXIMUM )) && (( $VALUE > $MINIMUM )); then 
