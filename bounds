@@ -11,6 +11,8 @@ function usage()
     echo ""
     echo "pull-temperature | bounds --minimum=32 --maximum=90 --name=sensor1"
     echo ""
+    echo ""
+    echo "Note: This command ignores decimal places."
 }
 
 if [ "$1" == "" ]; then

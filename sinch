@@ -43,9 +43,9 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo $secret
-
 while read message 
 do
-  curl --user "application\\$key:$secret" --data '{"message":"'$message'"}' -H 'Content-Type: application/json' https://messagingapi.sinch.com/v1/sms/$phone
+  echo $message
+  message='{"message":"'$message'"}'
+  curl --user "application\\$key:$secret" --data "$message"  -H 'Content-Type: application/json' https://messagingapi.sinch.com/v1/sms/$phone
 done < /dev/stdin
