@@ -3,15 +3,20 @@
 # Usage output.
 function usage()
 {
+    echo ""
     echo "Bounds."
     echo ""
-    echo "bounds"
-    echo "\t-h --help"
-    echo "\t--minimum=$MINIMUM"
-    echo "\t--maximum=$MAXIMUM"
-    echo "\t--process-name=$PROCESS_NAME"
+    echo ""
+    echo "Example usage:"
+    echo ""
+    echo "pull-temperature | bounds --minimum=32 --maximum=90 --name=sensor1"
     echo ""
 }
+
+if [ "$1" == "" ]; then
+  usage
+  exit 1
+fi
 
 # Parse options.
 while [ "$1" != "" ]; do
@@ -44,13 +49,14 @@ done
 
 # States.
 LAST_VALUE_WAS_IN_BOUNDS="true"
-CURRENT_VALUE_IS_IN_BOUNDS="false"
+CURRENT_VALUE_IS_IN_BOUNDS="true"
 
 # If we have a process name, set up a state store on the file system.
 if [ $PROCESS_NAME ]; then
   STATE_STORE="/tmp/.bounds-process-$PROCESS_NAME"
-  if [-f $STATE_STORE ]; then 
-    $LAST_VALUE_WAS_IN_BOUNDS=$(cat $STATE_STORE)  
+  if [ -f $STATE_STORE ]; then 
+    LAST_VALUE_WAS_IN_BOUNDS=`cat $STATE_STORE`
+    # echo "LAST_VALUE_WAS_IN_BOUNDS is now $LAST_VALUE_WAS_IN_BOUNDS which is cool." 
   else
     touch $STATE_STORE
     echo "$CURRENT_VALUE_IS_IN_BOUNDS" > $STATE_STORE
@@ -60,22 +66,27 @@ fi
 # Read from pipe's stdin and echo if boundaries are crossed.
 while read VALUE 
 do
-  if (( $VALUE < $MAXIMUM )) && (( $VALUE > $MINUMUM )); then 
-    $CURRENT_VALUE_IS_IN_BOUNDS="true"
+  #echo "value: $VALUE"
+  #echo "maximum: $MAXIMUM"
+  #echo "minumum: $MINIMUM"
+  #echo "LAST_VALUE_WAS_IN_BOUNDS: $LAST_VALUE_WAS_IN_BOUNDS"
+  if (( MINIMUM < VALUE )) && (( VALUE < MAXIMUM )); then 
+    CURRENT_VALUE_IS_IN_BOUNDS="true"
   else
-    $CURRENT_VALUE_IS_IN_BOUNDS="false"
+    CURRENT_VALUE_IS_IN_BOUNDS="false"
   fi
-  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "true" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "" ] ; then
-    echo "in bounds" 
-  fi
-  if [ $CURRENT_VALUE_IS_IN_BOUNDS == "false" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "" ] ; then
-    echo "out of bounds"
-  fi
+  
   if [ $CURRENT_VALUE_IS_IN_BOUNDS == "true" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "false" ] ; then
-    echo "now in bounds"
+    MESSAGE="in bounds at $VALUE"
   fi
   if [ $CURRENT_VALUE_IS_IN_BOUNDS == "false" ] && [ $LAST_VALUE_WAS_IN_BOUNDS == "true" ] ; then
-    echo "now out of bounds"
+    MESSAGE="out of bounds at $VALUE"
+  fi
+  if [ "$MESSAGE" != "" ]; then
+    if [ "$PROCESS_NAME" != "" ]; then
+      MESSAGE="$PROCESS_NAME is $MESSAGE"
+    fi
+    echo $MESSAGE
   fi
   # Save state.
   if [ $PROCESS_NAME ]; then
