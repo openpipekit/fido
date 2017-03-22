@@ -1,0 +1,51 @@
+#!/usr/bin/env bash 
+
+function usage()
+{
+    echo "Sinch."
+    echo ""
+    echo ""
+    echo "Example usage:"
+    echo ""
+    echo "sinch --key=o7254479-2fcc-06bd-80be-ddib03dc0e33 --secret=QGyd655vAk2/fbclIseZcQ== --phone=802-488-4779"
+    echo ""
+}
+
+if [ "$1" == "" ]; then
+  usage
+  exit 1
+fi
+
+# Parse options.
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+        -h | --help)
+            usage
+            exit
+            ;;
+        --key)
+            key=$VALUE
+            ;;
+        --secret)
+            secret="$VALUE=="
+            ;;
+        --phone)
+            phone=$VALUE
+            ;;
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo $secret
+
+while read message 
+do
+  curl --user "application\\$key:$secret" --data '{"message":"'$message'"}' -H 'Content-Type: application/json' https://messagingapi.sinch.com/v1/sms/$phone
+done < /dev/stdin
