@@ -66,6 +66,7 @@ fi
 # Read from pipe's stdin and echo if boundaries are crossed.
 while read VALUE 
 do
+  VALUE=$(echo $VALUE | awk -F "." '{ print $1 }')
   #echo "value: $VALUE"
   #echo "maximum: $MAXIMUM"
   #echo "minumum: $MINIMUM"
