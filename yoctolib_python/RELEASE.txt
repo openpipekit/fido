@@ -1,0 +1,2 @@
+- Fix network discovery on host with multiples network interfaces
+- Fix potential deadlock on FreeAPI exit

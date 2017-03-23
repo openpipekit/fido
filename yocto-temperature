@@ -1,0 +1,1 @@
+sudo python `dirname $0`/yoctolib_python/pull.py
