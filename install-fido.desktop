@@ -1,5 +1,0 @@
-[Desktop Entry]
-Name=Install Fido
-Exec=bash -c '"$(dirname "$1")"/tools/wizard.sh' dummy %k
-Terminal=true
-Type=Application
