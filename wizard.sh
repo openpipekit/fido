@@ -69,7 +69,10 @@ echo ""
 FIDO_NAME="Fido"
 FIDO_COMMAND="$FIDO_DIRECTORY/tools/yocto-temperature | $FIDO_DIRECTORY/tools/bounds --minimum=$FIDO_MINIMUM --maximum=$FIDO_MAXIMUM --process-name=\"$FIDO_NAME\" | $FIDO_DIRECTORY/tools/sinch --key=$FIDO_SINCH_KEY --secret=$FIDO_SINCH_SECRET --phone=$FIDO_SINCH_PHONE"
 FIDO_USER=$(whoami)
-(crontab -u $FIDO_USER -l; echo "*/5 * * * * $FIDO_COMMAND" ) | crontab -u $FIDO_USER -
+# Remove Fido entries from cron.
+crontab -u $FIDO_USER -l | grep -v "Fido" | crontab -u $FIDO_USER
+# Add Fido entry to cron.
+(crontab -u $FIDO_USER -l; echo "*/1 * * * * $FIDO_COMMAND" ) | crontab -u $FIDO_USER -
 echo ""
 echo "Everything has installed. Press enter to exit wizard."
 read ENTER
