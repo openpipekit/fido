@@ -1,13 +1,15 @@
 # Fido
 
-To install, open a terminal and run...
+Get text message alerts when termperature goes out of an upper and lower bounds you set.
+
+## Requirements
+- Raspberry Pi with Raspbian installed.
+- For installation, you must have the Raspberry Pi hooked up to a monitor, keyboard, and mouse. 
+- A Yoctopuce USB Temperature sensor
+
+## Install
+To install, boot up your Raspberry Pi connected to a monitor/keyboard/mouse and then copy paste this command into a terminal and press Enter:
 ```
-curl https://rjsteinert.github.io/fido/install.sh | bash
+curl https://openpipekit.github.io/fido/install.sh | bash
 ```
 
-
-Interested in running it manually? Try this in a terminal.
-```
-cd ~/Fido
-./tools/yocto-temperature | ./tools/bounds --minimum=1 --maximum=25 --process-name=sensor1 | ./tools/sinch --key=17254479-2fcc-46b8-8rbe-dd1b0rdc0e33 --secret=QGrd655rAr2/fbrlIseZcQ== --phone=8024884622
-```
