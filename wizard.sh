@@ -70,7 +70,7 @@ FIDO_NAME="Fido"
 FIDO_COMMAND="$FIDO_DIRECTORY/tools/yocto-temperature | $FIDO_DIRECTORY/tools/bounds --minimum=$FIDO_MINIMUM --maximum=$FIDO_MAXIMUM --process-name=\"$FIDO_NAME\" | $FIDO_DIRECTORY/tools/sinch --key=$FIDO_SINCH_KEY --secret=$FIDO_SINCH_SECRET --phone=$FIDO_SINCH_PHONE"
 FIDO_USER=$(whoami)
 # Remove Fido entries from cron.
-crontab -u $FIDO_USER -l | grep -v "Fido" | crontab -u $FIDO_USER
+crontab -u $FIDO_USER -l | grep -v "Fido" | crontab -u $FIDO_USER -
 # Add Fido entry to cron.
 (crontab -u $FIDO_USER -l; echo "*/1 * * * * $FIDO_COMMAND" ) | crontab -u $FIDO_USER -
 echo ""
