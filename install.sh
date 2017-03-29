@@ -1,10 +1,12 @@
 
 FIDO_DIR=$HOME/Fido
 FIDO_VERSION="master"
-if [ -f $FIDO_DIR ]; then
-  rm -rf $FIDO_DIR
+if [ -d $FIDO_DIR ]; then
+  cd $FIDO_DIR
+  git pull
+else
+  git clone https://github.com/rjsteinert/fido.git $FIDO_DIR
+  cd $FIDO_DIR
 fi
-git clone https://github.com/rjsteinert/fido.git $FIDO_DIR
-cd $FIDO_DIR
 git checkout $FIDO_VERSION
 lxterminal --title="Fido Installation Wizard" -e "bash -c ./wizard.sh;bash"
