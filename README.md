@@ -1,4 +1,4 @@
-# Fido Wifi Wizard
+# Fido
 This repositry contains a set up wizard, documentation, and other tools for configuring a Raspberry Pi to send temperature alerts via text message.
 
 ## Quickstart: Run the wizard
