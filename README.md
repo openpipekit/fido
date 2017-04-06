@@ -2,7 +2,7 @@
 This repositry contains a set up wizard, documentation, and other tools for configuring a Raspberry Pi to send temperature alerts via text message.
 
 ## Quickstart: Run the wizard
-Already have your Raspberry Pi plugged in and booted up? Run the Fido Wifi Wizard by opening a terminal and copy/pasting this command in. 
+Already have your Raspberry Pi plugged in and booted up in the GUI? Run the Fido Wifi Wizard by opening a terminal and copy/pasting this command in. 
 
 ```
 curl https://openpipekit.github.io/fido/install.sh | bash
