@@ -1,4 +1,6 @@
-# Fido
+# Fido, temperature alerts using a Raspberry Pi
+[![screenshot](docs/screenshot.png)](https://www.youtube.com/watch?v=T5jKz8d6kaI&feature=youtu.be)
+
 This repositry contains a set up wizard, documentation, and other tools for configuring a Raspberry Pi to send temperature alerts via text message.
 
 ## Quickstart: Run the wizard
