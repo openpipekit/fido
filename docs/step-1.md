@@ -1,9 +1,5 @@
 # Fido Wifi Step 1: Getting the parts together and setting up the Raspberry Pi
 
-## Tutorials
-1. [Decide what parts to buy]() (coming soon)
-2. [Assemble the parts]() (coming soon)
-
 ## Parts list 
 
 ### For deployment 
