@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+	<head>
+	<script>
+		let update = async () => {
+			let res = await fetch('now.json')
+			let json = await res.json()
+			document.body.innerHTML = `<h1>Temperature: ${json.temperature}</h1>`
+		}
+		update()
+		setInterval(update, 60000)
+	</script>
+	</head>
+	<body>
+	</body>
+</html>
