@@ -5,7 +5,7 @@
 		let update = async () => {
 			let res = await fetch('now.json')
 			let json = await res.json()
-			document.body.innerHTML = `<h1>Temperature: ${json.temperature}</h1>`
+			document.body.innerHTML = `<h2>Temperature: ${json.temperature} &deg;C, ${((9/5)*json.temperature)+32} &deg;F</h1>`
 		}
 		update()
 		setInterval(update, 60000)
