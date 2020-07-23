@@ -627,7 +627,7 @@ class YSerialPort(YFunction):
     def writeMODBUS(self, hexString):
         """
         Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
-        The message must start with the slave address. The MODBUS CRC/LRC is
+        The message must start with the subordinate address. The MODBUS CRC/LRC is
         automatically added by the function. This function does not wait for a reply.
 
         @param hexString : a hexadecimal message string, including device address but no CRC/LRC
@@ -970,12 +970,12 @@ class YSerialPort(YFunction):
         res = self._json_get_string(YString2Byte(msgarr[0]))
         return res
 
-    def queryMODBUS(self, slaveNo, pduBytes):
+    def queryMODBUS(self, subordinateNo, pduBytes):
         """
-        Sends a message to a specified MODBUS slave connected to the serial port, and reads the
+        Sends a message to a specified MODBUS subordinate connected to the serial port, and reads the
         reply, if any. The message is the PDU, provided as a vector of bytes.
 
-        @param slaveNo : the address of the slave MODBUS device to query
+        @param subordinateNo : the address of the subordinate MODBUS device to query
         @param pduBytes : the message to send (PDU), as a vector of bytes. The first byte of the
                 PDU is the MODBUS function code.
 
@@ -997,8 +997,8 @@ class YSerialPort(YFunction):
         # hexb
         funCode = pduBytes[0]
         nib = ((funCode) >> (4))
-        pat = "" + ("%02X" % slaveNo) + "[" + ("%X" % nib) + "" + ("%X" % (nib+8)) + "]" + ("%X" % ((funCode) & (15))) + ".*"
-        cmd = "" + ("%02X" % slaveNo) + "" + ("%02X" % funCode)
+        pat = "" + ("%02X" % subordinateNo) + "[" + ("%X" % nib) + "" + ("%X" % (nib+8)) + "]" + ("%X" % ((funCode) & (15))) + ".*"
+        cmd = "" + ("%02X" % subordinateNo) + "" + ("%02X" % funCode)
         i = 1
         while i < len(pduBytes):
             cmd = "" + cmd + "" + ("%02X" % ((pduBytes[i]) & (0xff)))
@@ -1008,7 +1008,7 @@ class YSerialPort(YFunction):
         msgs = self._download(url)
         reps = self._json_get_array(msgs)
         if not (len(reps) > 1):
-            self._throw(YAPI.IO_ERROR, "no reply from slave")
+            self._throw(YAPI.IO_ERROR, "no reply from subordinate")
         if len(reps) > 1:
             rep = self._json_get_string(YString2Byte(reps[0]))
             replen = ((len(rep) - 3) >> (1))
@@ -1029,12 +1029,12 @@ class YSerialPort(YFunction):
                     self._throw(YAPI.INVALID_ARGUMENT, "MODBUS error: failed to execute function")
         return res
 
-    def modbusReadBits(self, slaveNo, pduAddr, nBits):
+    def modbusReadBits(self, subordinateNo, pduAddr, nBits):
         """
         Reads one or more contiguous internal bits (or coil status) from a MODBUS serial device.
         This method uses the MODBUS function code 0x01 (Read Coils).
 
-        @param slaveNo : the address of the slave MODBUS device to query
+        @param subordinateNo : the address of the subordinate MODBUS device to query
         @param pduAddr : the relative address of the first bit/coil to read (zero-based)
         @param nBits : the number of bits/coils to read
 
@@ -1057,7 +1057,7 @@ class YSerialPort(YFunction):
         pdu.append(((nBits) & (0xff)))
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1082,12 +1082,12 @@ class YSerialPort(YFunction):
         
         return res
 
-    def modbusReadInputBits(self, slaveNo, pduAddr, nBits):
+    def modbusReadInputBits(self, subordinateNo, pduAddr, nBits):
         """
         Reads one or more contiguous input bits (or discrete inputs) from a MODBUS serial device.
         This method uses the MODBUS function code 0x02 (Read Discrete Inputs).
 
-        @param slaveNo : the address of the slave MODBUS device to query
+        @param subordinateNo : the address of the subordinate MODBUS device to query
         @param pduAddr : the relative address of the first bit/input to read (zero-based)
         @param nBits : the number of bits/inputs to read
 
@@ -1110,7 +1110,7 @@ class YSerialPort(YFunction):
         pdu.append(((nBits) & (0xff)))
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1135,12 +1135,12 @@ class YSerialPort(YFunction):
         
         return res
 
-    def modbusReadRegisters(self, slaveNo, pduAddr, nWords):
+    def modbusReadRegisters(self, subordinateNo, pduAddr, nWords):
         """
         Reads one or more contiguous internal registers (holding registers) from a MODBUS serial device.
         This method uses the MODBUS function code 0x03 (Read Holding Registers).
 
-        @param slaveNo : the address of the slave MODBUS device to query
+        @param subordinateNo : the address of the subordinate MODBUS device to query
         @param pduAddr : the relative address of the first holding register to read (zero-based)
         @param nWords : the number of holding registers to read
 
@@ -1162,7 +1162,7 @@ class YSerialPort(YFunction):
         pdu.append(((nWords) & (0xff)))
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1180,12 +1180,12 @@ class YSerialPort(YFunction):
         
         return res
 
-    def modbusReadInputRegisters(self, slaveNo, pduAddr, nWords):
+    def modbusReadInputRegisters(self, subordinateNo, pduAddr, nWords):
         """
         Reads one or more contiguous input registers (read-only registers) from a MODBUS serial device.
         This method uses the MODBUS function code 0x04 (Read Input Registers).
 
-        @param slaveNo : the address of the slave MODBUS device to query
+        @param subordinateNo : the address of the subordinate MODBUS device to query
         @param pduAddr : the relative address of the first input register to read (zero-based)
         @param nWords : the number of input registers to read
 
@@ -1207,7 +1207,7 @@ class YSerialPort(YFunction):
         pdu.append(((nWords) & (0xff)))
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1225,12 +1225,12 @@ class YSerialPort(YFunction):
         
         return res
 
-    def modbusWriteBit(self, slaveNo, pduAddr, value):
+    def modbusWriteBit(self, subordinateNo, pduAddr, value):
         """
         Sets a single internal bit (or coil) on a MODBUS serial device.
         This method uses the MODBUS function code 0x05 (Write Single Coil).
 
-        @param slaveNo : the address of the slave MODBUS device to drive
+        @param subordinateNo : the address of the subordinate MODBUS device to drive
         @param pduAddr : the relative address of the bit/coil to set (zero-based)
         @param value : the value to set (0 for OFF state, non-zero for ON state)
 
@@ -1252,7 +1252,7 @@ class YSerialPort(YFunction):
         pdu.append(0x00)
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1260,12 +1260,12 @@ class YSerialPort(YFunction):
         res = 1
         return res
 
-    def modbusWriteBits(self, slaveNo, pduAddr, bits):
+    def modbusWriteBits(self, subordinateNo, pduAddr, bits):
         """
         Sets several contiguous internal bits (or coils) on a MODBUS serial device.
         This method uses the MODBUS function code 0x0f (Write Multiple Coils).
 
-        @param slaveNo : the address of the slave MODBUS device to drive
+        @param subordinateNo : the address of the subordinate MODBUS device to drive
         @param pduAddr : the relative address of the first bit/coil to set (zero-based)
         @param bits : the vector of bits to be set (one integer per bit)
 
@@ -1308,7 +1308,7 @@ class YSerialPort(YFunction):
             pdu.append(val)
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1317,12 +1317,12 @@ class YSerialPort(YFunction):
         res = res + reply[4]
         return res
 
-    def modbusWriteRegister(self, slaveNo, pduAddr, value):
+    def modbusWriteRegister(self, subordinateNo, pduAddr, value):
         """
         Sets a single internal register (or holding register) on a MODBUS serial device.
         This method uses the MODBUS function code 0x06 (Write Single Register).
 
-        @param slaveNo : the address of the slave MODBUS device to drive
+        @param subordinateNo : the address of the subordinate MODBUS device to drive
         @param pduAddr : the relative address of the register to set (zero-based)
         @param value : the 16 bit value to set
 
@@ -1344,7 +1344,7 @@ class YSerialPort(YFunction):
         pdu.append(((value) & (0xff)))
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1352,12 +1352,12 @@ class YSerialPort(YFunction):
         res = 1
         return res
 
-    def modbusWriteRegisters(self, slaveNo, pduAddr, values):
+    def modbusWriteRegisters(self, subordinateNo, pduAddr, values):
         """
         Sets several contiguous internal registers (or holding registers) on a MODBUS serial device.
         This method uses the MODBUS function code 0x10 (Write Multiple Registers).
 
-        @param slaveNo : the address of the slave MODBUS device to drive
+        @param subordinateNo : the address of the subordinate MODBUS device to drive
         @param pduAddr : the relative address of the first internal register to set (zero-based)
         @param values : the vector of 16 bit values to set
 
@@ -1390,7 +1390,7 @@ class YSerialPort(YFunction):
             regpos = regpos + 1
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
@@ -1399,13 +1399,13 @@ class YSerialPort(YFunction):
         res = res + reply[4]
         return res
 
-    def modbusWriteAndReadRegisters(self, slaveNo, pduWriteAddr, values, pduReadAddr, nReadWords):
+    def modbusWriteAndReadRegisters(self, subordinateNo, pduWriteAddr, values, pduReadAddr, nReadWords):
         """
         Sets several contiguous internal registers (holding registers) on a MODBUS serial device,
         then performs a contiguous read of a set of (possibly different) internal registers.
         This method uses the MODBUS function code 0x17 (Read/Write Multiple Registers).
 
-        @param slaveNo : the address of the slave MODBUS device to drive
+        @param subordinateNo : the address of the subordinate MODBUS device to drive
         @param pduWriteAddr : the relative address of the first internal register to set (zero-based)
         @param values : the vector of 16 bit values to set
         @param pduReadAddr : the relative address of the first internal register to read (zero-based)
@@ -1444,7 +1444,7 @@ class YSerialPort(YFunction):
             regpos = regpos + 1
         
         # // may throw an exception
-        reply = self.queryMODBUS(slaveNo, pdu)
+        reply = self.queryMODBUS(subordinateNo, pdu)
         if len(reply) == 0:
             return res
         if reply[0] != pdu[0]:
